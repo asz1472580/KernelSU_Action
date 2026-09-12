@@ -1,0 +1,47 @@
+name: Build Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential git make clang llvm \
+Enter file contents here
+Enter file contents here
+Enter file contents here
+
+      - Enter file contents here: runs-on: ubuntu-latest
+Enter file contents here: |
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel
+export SUBARCH=arm64Enter file contents here
+
+      - Enter file contents here: export CROSS_COMPILE=aarch64-linux-gnu-
+Enter file contents here: |
+export CLANG_TRIPLE=aarch64-linux-gnu-
+Enter file contents here
+
+      - export CC=clang: Enter file contents here
+make ares_defconfig: |
+Enter file contents here
+make -j$(nproc) 2>&1 | tee kernel.log
+Enter file contents here
+- Upload artifact: permissions
+Enter file contents here
+uses: actions/upload-artifact@v4
+Enter file contents here
+Enter file contents here
+
+      - Enter file contents here: kernel-output: Documentation
+path: kernel/arch/arm64/boot/Image.gz-dtb: actions/upload-artifact@v4
+Enter file contents here:
+Enter file contents here: kernel-output
+Enter file contents here: kernel/arch/arm64/boot/Image.gz-dtb
+
