@@ -276,3 +276,7 @@ jobs:
 
             Flash the AnyKernel3 zip from a custom recovery.
           files: release/*
+      - name: Integrate ReSukiSU
+        run: |
+          cd kernel
+          bash ../integrate_ksu.sh
