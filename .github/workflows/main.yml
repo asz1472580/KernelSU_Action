@@ -1,47 +1,193 @@
-name: Build Kernel
+import { execSync } from "node:child_process";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
 
-on:
-  workflow_dispatch:
+// ========== 配置区域 ==========
+const CONFIG = {
+  kernelSource: "https://github.com/MiCode/Xiaomi_Kernel_OpenSource",
+  branch: "ares-t-oss",
+  defconfig: "ares_defconfig",
+  arch: "arm64",
+  outputImage: "Image.gz-dtb",
+  workDir: join(process.cwd(), "build"),
+  kernelDir: join(process.cwd(), "build", "kernel"),
+};
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+// ========== 工具函数 ==========
+function run(cmd, cwd = process.cwd()) {
+  console.log(`\n▶ ${cmd}`);
+  execSync(cmd, { cwd, stdio: "inherit" });
+}
 
-    steps:
-      - uses: actions/checkout@v4
+function cleanBuildDir() {
+  if (existsSync(CONFIG.workDir)) {
+    console.log("🧹 清理旧的构建目录...");
+    rmSync(CONFIG.workDir, { recursive: true });
+  }
+  mkdirSync(CONFIG.workDir, { recursive: true });
+}
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential git make clang llvm \
-Enter file contents here
-Enter file contents here
-Enter file contents here
+// ========== 编译步骤 ==========
 
-      - Enter file contents here: runs-on: ubuntu-latest
-Enter file contents here: |
-https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel
-export SUBARCH=arm64Enter file contents here
+// 第一步：克隆内核源码
+function cloneKernel() {
+  console.log("\n📥 第一步：下载内核源码...");
+  run(
+    `git clone --depth=1 -b ${CONFIG.branch} ${CONFIG.kernelSource} kernel`,
+    CONFIG.workDir
+  );
+}
 
-      - Enter file contents here: export CROSS_COMPILE=aarch64-linux-gnu-
-Enter file contents here: |
-export CLANG_TRIPLE=aarch64-linux-gnu-
-Enter file contents here
+// 第二步：集成 ReSukiSU
+function integrateReSukiSU() {
+  console.log("\n🔧 第二步：集成 ReSukiSU...");
+  run(
+    'curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin',
+    CONFIG.kernelDir
+  );
+}
 
-      - export CC=clang: Enter file contents here
-make ares_defconfig: |
-Enter file contents here
-make -j$(nproc) 2>&1 | tee kernel.log
-Enter file contents here
-- Upload artifact: permissions
-Enter file contents here
-uses: actions/upload-artifact@v4
-Enter file contents here
-Enter file contents here
+// 第三步：编译内核
+function buildKernel() {
+  console.log("\n⚙️ 第三步：编译内核...");
+  const env = {
+    ...process.env,
+    ARCH: CONFIG.arch,
+    SUBARCH: CONFIG.arch,
+    CROSS_COMPILE: "aarch64-linux-gnu-",
+    CLANG_TRIPLE: "aarch64-linux-gnu-",
+    CC: "clang",
+  };
 
-      - Enter file contents here: kernel-output: Documentation
-path: kernel/arch/arm64/boot/Image.gz-dtb: actions/upload-artifact@v4
-Enter file contents here:
-Enter file contents here: kernel-output
-Enter file contents here: kernel/arch/arm64/boot/Image.gz-dtb
+  run(`make ${CONFIG.defconfig}`, CONFIG.kernelDir);
+  run(`make -j$(nproc) 2>&1 | tee kernel.log`, CONFIG.kernelDir);
+}
+
+// 第四步：检查编译产物
+function checkOutput() {
+  console.log("\n📦 第四步：检查编译产物...");
+  const outputPath = join(
+    CONFIG.kernelDir,
+    "arch",
+    CONFIG.arch,
+    "boot",
+    CONFIG.outputImage
+  );
+
+  if (existsSync(outputPath)) {
+    console.log(`\n✅ 编译成功！产物位置：${outputPath}`);
+  } else {
+    console.error(`\n❌ 编译产物未找到：${outputPath}`);
+    console.error("请检查编译日志排查错误。");
+    process.exit(1);
+  }
+}
+
+// ========== 主流程 ==========
+console.log("🚀 开始内核编译流程（ares + ReSukiSU）\n");
+console.log(`工作目录：${CONFIG.workDir}`);
+
+cleanBuildDir();
+cloneKernel();
+integrateReSukiSU();
+buildKernel();
+checkOutput();
+
+console.log("\n🎉 全部完成！");
+import { execSync } from "node:child_process";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
+
+"\n🎉 全部完成！"
+import{
+execSync: "https://github.com/MiCode/Xiaomi_Kernel_OpenSource",
+from: "ares-t-oss",
+import: "ares_defconfig",
+"\n🎉 全部完成！": "arm64",
+import: "Image.gz-dtb",
+"\n🎉 全部完成！": join(process.cwd(), "build"),
+execSync: join(process.cwd(), "build", "kernel"),
+};
+
+from
+import{
+existsSync, mkdirSync, rmSync{from}`);
+import: "inherit" });
+}
+
+join{
+from{
+    console.log(outputImage);
+// ========== 配置区域 ==========: const CONFIG =});
+  }
+kernelSource: branch});
+}
+
+defconfig
+
+arch
+execSync(cmd, {workDir{
+kernelDir
+  run(
+// ========== 工具函数 =========={CONFIG.branch}function run(cmd, cwd = process.cwd()){CONFIG.kernelSource} kernel`,
+    CONFIG.workDir
+  );
+}
+
+rmSync(CONFIG.workDir, {console.log(`\n▶ $
+cmd{
+  console.log(mkdirSync(CONFIG.workDir, { recursive);
+  run(
+cwd, stdio
+    CONFIG.kernelDir
+  );
+}
+
+console.log(function cleanBuildDir());if (existsSync(CONFIG.workDir))
+"🧹 清理旧的构建目录..."
+recursivefunction integrateReSukiSU()true"请检查编译日志排查错误。"'curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin'
+"\n⚙️ 第三步：编译内核..."// 第三步：编译内核{
+    ...process.env,
+const env =Enter file contents herefunction cleanBuildDir()CONFIG.arch,
+ARCH: CONFIG.arch,
+    CROSS_COMPILE: "aarch64-linux-gnu-",
+    CLANG_TRIPLE: "aarch64-linux-gnu-",
+// ========== 主流程 ==========: CONFIG.arch,: "clang",
+  };
+
+CROSS_COMPILE: "aarch64-linux-gnu-",{CONFIG.defconfig}CLANG_TRIPLE: "aarch64-linux-gnu-",
+CC: "clang",
+}
+
+run(`make ${CONFIG.defconfig}`, CONFIG.kernelDir);
+run(`make -j$(nproc) 2>&1 | tee kernel.log`, CONFIG.kernelDir);{
+SUBARCH
+function checkOutput(){
+    CONFIG.kernelDir,
+    "arch",
+    CONFIG.arch,
+    "boot",
+    CONFIG.outputImage
+  );
+
+"\n📦 第四步：检查编译产物..."{CONFIG.workDir}`);{
+const outputPath = join({if (existsSync(outputPath)){}`);
+  }outputPath{const outputPath = join(}`);{
+}outputPath{{console.log(`\n✅ 编译成功！产物位置：${outputPath}`);}`);
+outputPath
+    process.exit(1);
+  }
+}
+
+CC
+run(`make $
+"请检查编译日志排查错误。"{CONFIG.workDir}`);{CONFIG.workDir}`);
+
+cleanBuildDir();
+cloneKernel();
+integrateReSukiSU();
+buildKernel();
+checkOutput();
+
+`, CONFIG.kernelDir);
 
